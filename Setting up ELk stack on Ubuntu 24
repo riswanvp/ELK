@@ -131,8 +131,26 @@ output.logstash:
   hosts: ["localhost:5044"]
   
   
-Enable the system module, which collects log data from the local system.
+b) Enable the system module, which collects log data from the local system.
 
 filebeat modules enable system
+
+
+c) Set up Filebeat to load the index template into Elasticsearch.
+
+sudo filebeat setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["0.0.0.0:9200"]'
+
+d) Start and enable the Filebeat service
+
+systemctl enable filebeat
+systemctl start filebeat
+
+
+
+For verify the working of elasticsearch receiving data from filebeat, enter the curl command 
+
+curl -XGET "localhost:9200/_cat/indices?v"
+
+
 
 
