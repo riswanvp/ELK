@@ -1,0 +1,138 @@
+			Setting up ELk stack on Ubuntu
+			=============================
+
+1. Prerequisites
+
+a) Update packages and install the apt-transport-https package to access repository over HTTPS.
+
+sudo -i
+
+apt update
+
+apt install apt-transport-https
+
+b) Elastic Stack components require Java. We need to install OpenJDK 11, which is a widely used open-source implementation of the Java Platform.
+
+apt install openjdk-11-jdk
+
+java -version		// verify version
+
+c) To ensure stack components can locate Java, need to set the JAVA_HOME environment variable. Open the environment file.
+
+vi  /etc/environment
+
+add below line in end of the file
+
+JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+
+Run the command "source /etc/environment" for reload the environment
+
+Verify that JAVA_HOME run echo command
+
+echo $JAVA_HOME
+
+
+2. Installation of ElasticSearch 
+
+a) Import the public signing key and add the Elasticsearch APT repository to your system.
+
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+
+
+b) Add the repository definition,
+
+echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+
+c)Update the package again
+
+	apt-get update
+
+	Install Elasticsearch
+
+	apt-get install elasticsearch
+
+ Start and enable the service,
+
+	systemctl start elasticsearch
+	systemctl enable elasticsearch
+	
+Verify service is up and running
+
+systemctl status elasticsearch
+
+
+d) To allow external access to Elasticsearch, modify the configuration file /etc/elasticsearch/elasticsearch.yml
+
+network.host: 0.0.0.0			// bind all address
+discovery.seed_hosts:[]			// to specify the initial nodes for cluster formation discovery.seed_hosts: []
+xpack.security.enabled: false		//for testing setup disable security features
+
+
+Save and restart elasticsearch
+
+systemctl start elasticsearch
+
+Then verify service up and functioning correctly and send http request using curl or call on browser http://ipaddress:9200
+curl -X GET "localhost:9200"
+
+The result will be json response
+
+
+3. Installation of Logstash
+
+apt-get install logstash
+
+Start and enable logstash
+
+systemctl start logstash
+
+systemctl enable logstash
+
+systemctl status logstash
+
+4. Installation of Kibana
+
+a) apt-get install kibana
+
+systemctl start kibana
+systemctl enable kibana
+
+
+b) To configure Kibana for external access, edit the configuration file /etc/kibana/kibana.yml
+
+server.port: 5601
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://localhost:9200"]
+
+
+Uncomment and adjust the following lines to bind Kibana to all IP addresses and connect it to Elasticsearch
+
+systemctl restart kibana
+
+
+c) For accessing the Kibana interface by navigating to http://<server-ip>:5601 in your web browser. 
+
+6. Installation of Filebeat
+
+
+a) Install Filebeat using following command.
+   apt-get install filebeat
+
+Open filebeat configuration file for editing vi /etc/filebeat/filebeat.yml
+
+Comment out the Elasticsearch output section.
+
+# output.elasticsearch:
+ #  hosts: ["localhost:9200"]
+ 
+Uncomment and configure the Logstash output section
+
+output.logstash:
+  hosts: ["localhost:5044"]
+  
+  
+Enable the system module, which collects log data from the local system.
+
+filebeat modules enable system
+
+
