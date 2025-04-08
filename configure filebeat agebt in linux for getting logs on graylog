@@ -1,0 +1,68 @@
+download and Install file beat on Agent machine.
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.12.2-amd64.deb
+
+
+dpkg -i filebeat-8.12.2-amd64.deb
+
+vi /etc/filebeat/filebeat.yml
+
+
+update below parameters 
+
+====================
+
+filebeat.inputs:
+
+- type: log
+enabled: true
+paths:
+- /var/log/jenkins/jenkins.log  # Correct path for Jenkins logs
+
+output.logstash:
+  hosts: ["<graylog_server_ip>:5044"]
+  
+ Disable Elasticsearch output 
+ 
+# output.elasticsearch:
+#   hosts: ["localhost:9200"]
+
+
+===============  
+
+check syntax using the command
+
+filebeat test config
+
+
+If no error shows Restart filebeat service using below command
+
+systemctl status filebeat
+systemctl restart filebeat
+systemctl enable filebeat
+
+==================
+
+Allow traffic to the port 5044 on Graylog server. 
+
+Configure Beats Input in Graylog
+
+1.Open Graylog Web UI → System → Inputs.
+2. Select Beats from the dropdown menu.
+3.Click Launch New Input and configure:
+        Title: jenkins
+        Bind address: 0.0.0.0
+        Port: 5044
+        Override Source: jenkins
+Click Save & Start Input.
+
+
+check connection to the graylog server 
+telnet Ipadress 5044
+filebeat test output
+
+
+
+
+
+
