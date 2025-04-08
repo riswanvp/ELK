@@ -1,9 +1,11 @@
-download and Install file beat on Agent machine.
+Step 1: download and Install file beat on Agent machine.
 
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.12.2-amd64.deb
 
-
 dpkg -i filebeat-8.12.2-amd64.deb
+
+Step 2: Update filebeat configuration
+
 
 vi /etc/filebeat/filebeat.yml
 
@@ -30,12 +32,12 @@ output.logstash:
 
 ===============  
 
-check syntax using the command
+Step 3: check syntax using the command
 
 filebeat test config
 
 
-If no error shows Restart filebeat service using below command
+Step 4: If no error shows Restart filebeat service using below command
 
 systemctl status filebeat
 systemctl restart filebeat
@@ -43,7 +45,7 @@ systemctl enable filebeat
 
 ==================
 
-Allow traffic to the port 5044 on Graylog server. 
+Step 5: Allow traffic to the port 5044 on Graylog server. 
 
 Configure Beats Input in Graylog
 
